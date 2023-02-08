@@ -26,7 +26,7 @@ var y = canvas.height-200
 var dx = 2
 var dy = 3 
 let difficulty = 50
-console.log(sessionStorage.getItem('difficulty'))
+
 if (sessionStorage.getItem('difficulty')){
     difficulty = sessionStorage.getItem('difficulty')
     difficultybar.value = difficulty
@@ -39,7 +39,6 @@ let barx = canvas.width - 100
 let bary = 100
 let score = 0
 let goingup = false
-// y = a(t)^2 + v(t) + h
 
 function updateDifficulty(){
     difficulty = document.getElementById('difficultybar').value
@@ -82,11 +81,32 @@ function drawObstacles(){
 }
 
 function endgame() {
-    alert("GAME OVER")
-    document.location.reload()
-    clearInterval(interval)
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawObstacles()
+    drawBall()
+    drawBird()
+    ctx.font = "24px Arial";
+    ctx.fillStyle = "#eeeeee";
+    ctx.fillText(`Score: ${score}`, 190, 30);
+
+    ctx.font = "24px Arial";
+    ctx.fillStyle = "#eeeeee";
+    ctx.fillText("PLAY AGAIN", 170, 170);
+    canvas.addEventListener('click', newGame)
 }
 
+function newGame(){
+    flapped = 0
+    score = 0
+    goingup = false
+    endMenu = false
+    barx = canvas.width
+    x = canvas.width/4
+    y = canvas.height-200
+    dx = 2
+    dy = 3 
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
 function drawScore() {
   ctx.font = "24px Arial";
   ctx.fillStyle = "#eeeeee";
@@ -98,9 +118,9 @@ function draw() {
     drawObstacles()
     drawBall()
     drawBird()
-    if(y + dy > canvas.height-ballRadius || y + dy < ballRadius) {endgame()}
+    if(y + dy > canvas.height-ballRadius || y + dy < ballRadius) {endMenu = true}
 
-    if ((y < bary || y + 20 > bary + 150 - difficulty) && (barx < x && x < barx+90)) {endgame()}
+    if ((y < bary || y + 20 > bary + 150 - difficulty) && (barx < x && x < barx+90)) {endMenu = true}
     if (spacePressed){
         flapped = 40
         spacePressed = false
@@ -127,4 +147,34 @@ function draw() {
     }
 }
 
-let interval = setInterval(draw, 10);
+let playbutton = {
+    x : canvas.width/2,
+    y : canvas.height/2,
+    width : 200,
+    height : 100
+}
+
+function playButtonPressed(){
+    displaymenu = false
+}
+
+function drawMenu(){
+    ctx.font = "24px Arial";
+    ctx.fillStyle = "#eeeeee";
+    ctx.fillText("PLAY", 210, 170);
+    canvas.addEventListener('click', playButtonPressed)
+}
+
+let displaymenu = true
+let endMenu = false
+function playGame(){
+    if (displaymenu == true){
+        drawMenu()
+    } else if (endMenu == false){
+        draw()
+    } else {
+        endgame()
+    }
+}
+
+setInterval(playGame, 10);
