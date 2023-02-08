@@ -16,6 +16,8 @@ function flap(e){
 let canvas = document.getElementById('gameCanvas')
 let ctx = canvas.getContext('2d')
 
+
+
 let difficultybar = document.getElementById('difficultybar')
 let spacePressed = false
 var ballRadius = 10
@@ -36,12 +38,31 @@ let flapped = 0
 let barx = canvas.width - 100
 let bary = 100
 let score = 0
+let goingup = false
 // y = a(t)^2 + v(t) + h
 
 function updateDifficulty(){
     difficulty = document.getElementById('difficultybar').value
     sessionStorage.setItem('difficulty', difficulty)
     console.log(difficulty)
+}
+let image = new Image()
+image.src = 'output-onlinepngtools.png'
+
+function drawBird(){
+    if (goingup){
+        ctx.save()
+        ctx.translate(x-35, y-35)
+        ctx.rotate(-30*Math.PI/180)
+        ctx.drawImage(image, -15,10)
+        ctx.restore()
+    } else {
+        ctx.save()
+        ctx.translate(x-35, y-35)
+        ctx.rotate(30*Math.PI/180)
+        ctx.drawImage(image, 15,-19)
+        ctx.restore()
+    }
 }
 
 function drawBall() {
@@ -75,10 +96,11 @@ function drawScore() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawObstacles()
-    drawBall();
+    drawBall()
+    drawBird()
     if(y + dy > canvas.height-ballRadius || y + dy < ballRadius) {endgame()}
 
-    if ((y  < bary || y > bary + 150 - difficulty) && (barx < x)) {endgame()}
+    if ((y < bary || y + 20 > bary + 150 - difficulty) && (barx < x && x < barx+90)) {endgame()}
     if (spacePressed){
         flapped = 40
         spacePressed = false
@@ -86,8 +108,10 @@ function draw() {
     if (flapped > 0) {
         y -= 20
         flapped -= 1
+        goingup = true
     } else {
         y += dy 
+        goingup = false
     }
     drawScore()
     flapped -= 10
