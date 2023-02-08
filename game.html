@@ -7,14 +7,17 @@
         <title>Floppy bird</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
+        <link rel="stylesheet" href="game.css">
     </head>
     <body>
         <h1>Welcome to Floppy Bird</h1>
-        <canvas id="gameCanvas" width="480" height="320" style="background-color: black; border:1px solid black;"></canvas>
+        <canvas id="gameCanvas" width="480" height="320"></canvas>
         <div>Press Spacebar to flap</div>
         <div id="score">Score: 0</div>
         <div id="hiscore">High Score: 0</div>
+        <div class="slidecontainer">
+            <input type="range" min="1" max="100" value="50" class="slider" id="difficultybar">
+        </div>
         <script src="gamelogic.js" async defer></script>
     </body>
 </html>
