@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener("keydown", flap)
     if (sessionStorage.getItem('score')){
-        document.getElementById('hiscore').innerText= sessionStorage.getItem('bestUser') + " high score: " + sessionStorage.getItem('score')
+        document.getElementById('hiscore').innerText=  "High Score: " + sessionStorage.getItem('score') + " - " + sessionStorage.getItem('bestUser')
     }
     let difficultybar = document.getElementById('difficultybar')
     difficultybar.addEventListener('change', updateDifficulty)
@@ -179,7 +179,7 @@ function draw() {
         if (score > sessionStorage.getItem('score')) {
             sessionStorage.setItem('score', score)
             sessionStorage.setItem('bestUser', sessionStorage.getItem('currentUser'))
-            document.getElementById('hiscore').innerText= sessionStorage.getItem('bestUser') + " high Score: " + score
+            document.getElementById('hiscore').innerText=  "High Score: " + score + " - " + sessionStorage.getItem('bestUser')
         }
     }
 }
