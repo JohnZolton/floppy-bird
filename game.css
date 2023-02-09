@@ -1,10 +1,24 @@
-
-canvas {
-    background-color: skyblue; 
-    border:1px solid black;
+.darkmode{
+  --backgroundcolor: #000000;
+  --textcolor: white;
+  --obstaclecolor: white;
+  --bordercolor: white;
+}
+.lightmode{
+  --backgroundcolor: skyblue;
+  --obstaclecolor: black;
+  --textcolor: rgb(0, 0, 0);
+  --bordercolor: black;
 }
 
 body {
+    background-color: var(--backgroundcolor);
+    color: var(--textcolor);
     text-align: center;
     justify-content: center;
+}
+
+canvas {
+    background-color: var(--backgroundcolor); 
+    border:1px solid var(--bordercolor);
 }

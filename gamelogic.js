@@ -76,26 +76,21 @@ function drawBird(){
     }
 }
 
-function drawBall() {
-    ctx.beginPath();
-    ctx.arc(x, y, ballRadius, 0, Math.PI*2);
-    ctx.fillStyle = "#b02c3a";
-    ctx.fill();
-    ctx.closePath();
-}
 
 function drawObstacles(){
+    let color = "#000000"
+    if (localStorage.getItem('theme') === 'darkmode') { color = "#eeeeee" } 
     //bottom rectangle
     ctx.beginPath();
     ctx.rect(barx, bary + 150 - difficulty, 50, 300);
-    ctx.fillStyle = "#000000";
+    ctx.fillStyle = color
     ctx.fill();
     ctx.closePath();
 
     //top rectangle
     ctx.beginPath();
     ctx.rect(barx, 0, 50, bary);
-    ctx.fillStyle = "#000000";
+    ctx.fillStyle = color
     ctx.fill();
     ctx.closePath();
 }
@@ -103,7 +98,6 @@ function drawObstacles(){
 function endgame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawObstacles()
-    drawBall()
     drawBird()
     ctx.font = "24px Arial";
     ctx.fillStyle = "#eeeeee";
@@ -118,6 +112,7 @@ function endgame() {
 
 function newGame(){
     document.getElementById('score').innerText= "Score: " + 0
+    canvas.removeEventListener('click', newGame)
     flapped = 0
     score = 0
     goingup = false
@@ -140,7 +135,6 @@ function drawScore() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawObstacles()
-    drawBall()
     drawBird()
     if(y + dy > canvas.height-ballRadius || y + dy < ballRadius) {endMenu = true}
 
@@ -205,3 +199,27 @@ function playGame(){
 }
 
 setInterval(playGame, 10);
+
+function changetheme(){
+    if (localStorage.getItem('theme') === 'darkmode') {
+        settheme('lightmode');
+        document.getElementById('switch').innerHTML = '&#x263E'
+    } else {
+        settheme('darkmode');
+        document.getElementById('switch').innerHTML = '&#x263C'
+    }
+}
+
+function settheme(theme){
+    localStorage.setItem('theme', theme)
+    document.documentElement.className= theme
+}
+
+
+(function (){
+    if (localStorage.getItem('theme') === 'darkmode') {
+        settheme('darkmode');
+    } else {
+        settheme('lightmode');
+    }
+})()
