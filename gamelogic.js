@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener("keydown", flap)
     if (sessionStorage.getItem('score')){
-        document.getElementById('hiscore').innerText= "High score: " + sessionStorage.getItem('score')
+        document.getElementById('hiscore').innerText= sessionStorage.getItem('bestUser') + " high score: " + sessionStorage.getItem('score')
     }
     let difficultybar = document.getElementById('difficultybar')
     difficultybar.addEventListener('change', updateDifficulty)
@@ -14,6 +14,7 @@ function showgame(){
     if (0 < username.length && username.length <= 15) {
         document.getElementById('gamebox').style.display = 'block'
         document.getElementById('usernameBox').style.display = 'none'
+        sessionStorage.setItem('currentUser', username)
     } else {
         document.getElementById('errorMessage').style.display = 'block'
     }
@@ -108,6 +109,7 @@ function endgame() {
 
 
 function newGame(){
+    document.getElementById('score').innerText= "Score: " + 0
     flapped = 0
     score = 0
     goingup = false
@@ -157,6 +159,8 @@ function draw() {
         document.getElementById('score').innerText= "Score: " + score
         if (score > sessionStorage.getItem('score')) {
             sessionStorage.setItem('score', score)
+            sessionStorage.setItem('bestUser', sessionStorage.getItem('currentUser'))
+            document.getElementById('hiscore').innerText= sessionStorage.getItem('bestUser') + " high Score: " + score
         }
     }
 }
