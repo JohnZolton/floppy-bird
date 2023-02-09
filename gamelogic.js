@@ -60,6 +60,15 @@ function updateDifficulty(){
 let image = new Image()
 image.src = 'output-onlinepngtools.png'
 
+let cloud = new Image()
+cloud.src = 'cloud.png'
+let cloudX = canvas.width
+let cloudY = Math.random()*canvas.height
+
+function drawcloud(){
+    ctx.drawImage(cloud, cloudX, cloudY)
+}
+
 function drawBird(){
     if (goingup){
         ctx.save()
@@ -97,6 +106,7 @@ function drawObstacles(){
 
 function endgame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawcloud()
     drawObstacles()
     drawBird()
     ctx.font = "24px Arial";
@@ -118,6 +128,7 @@ function newGame(){
     goingup = false
     endMenu = false
     spacePressed = false
+    cloudX = canvas.width
     barx = canvas.width
     bary = 100
     x = canvas.width/4
@@ -134,6 +145,7 @@ function drawScore() {
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawcloud()
     drawObstacles()
     drawBird()
     if(y + dy > canvas.height-ballRadius || y + dy < ballRadius) {endMenu = true}
@@ -154,6 +166,11 @@ function draw() {
     drawScore()
     flapped -= 10
     barx -= 7
+    cloudX -= 3
+    if (cloudX < 0) {
+        cloudX = canvas.width
+        cloudY = Math.random()*canvas.height
+    }
     if (barx < 0) {
         barx = canvas.width
         bary = Math.random()*(canvas.height - difficulty - 100)
