@@ -5,8 +5,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     let difficultybar = document.getElementById('difficultybar')
     difficultybar.addEventListener('change', updateDifficulty)
+    document.getElementById('getusername').addEventListener('submit', showgame)
 })
 
+function showgame(){
+    console.log(this[0].value)
+    let username = this[0].value
+    if (0 < username.length && username.length <= 15) {
+        document.getElementById('gamebox').style.display = 'block'
+        document.getElementById('usernameBox').style.display = 'none'
+    } else {
+        document.getElementById('errorMessage').style.display = 'block'
+    }
+    return false
+}
 function flap(e){
     if (e.key ===" "){
         spacePressed = true
@@ -15,7 +27,6 @@ function flap(e){
 
 let canvas = document.getElementById('gameCanvas')
 let ctx = canvas.getContext('2d')
-
 
 
 let difficultybar = document.getElementById('difficultybar')
@@ -87,7 +98,7 @@ function endgame() {
     drawBird()
     ctx.font = "24px Arial";
     ctx.fillStyle = "#eeeeee";
-    ctx.fillText(`Score: ${score}`, 190, 30);
+    ctx.fillText(`Score: ${score}`, 195, 30);
 
     ctx.font = "24px Arial";
     ctx.fillStyle = "#eeeeee";
@@ -95,12 +106,15 @@ function endgame() {
     canvas.addEventListener('click', newGame)
 }
 
+
 function newGame(){
     flapped = 0
     score = 0
     goingup = false
     endMenu = false
+    spacePressed = false
     barx = canvas.width
+    bary = 100
     x = canvas.width/4
     y = canvas.height-200
     dx = 2
@@ -159,6 +173,7 @@ function playButtonPressed(){
 }
 
 function drawMenu(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.font = "24px Arial";
     ctx.fillStyle = "#eeeeee";
     ctx.fillText("PLAY", 210, 170);
