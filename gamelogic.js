@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener("keydown", flap)
+
     if (sessionStorage.getItem('score')){
         document.getElementById('hiscore').innerText=  "High Score: " + sessionStorage.getItem('score') + " - " + sessionStorage.getItem('bestUser')
     }
@@ -28,6 +29,9 @@ function flap(e){
 
 let canvas = document.getElementById('gameCanvas')
 let ctx = canvas.getContext('2d')
+canvas.addEventListener('click', function() { 
+    if (displaymenu == false){spacePressed = true}
+    }, false);
 
 
 let difficultybar = document.getElementById('difficultybar')
@@ -230,6 +234,11 @@ function changetheme(){
 function settheme(theme){
     localStorage.setItem('theme', theme)
     document.documentElement.className= theme
+    if (theme==='darkmode') {
+        document.getElementById('switch').innerHTML = '&#x263E'
+    } else {
+        document.getElementById('switch').innerHTML = '&#x263C'
+    }
 }
 
 

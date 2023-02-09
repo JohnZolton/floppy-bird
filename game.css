@@ -18,9 +18,32 @@ body {
     color: var(--textcolor);
     text-align: center;
     justify-content: center;
+    font-family: "OCR", "Lucida Console", "Courier New", monospace;
 }
 
 canvas {
     background-color: var(--gamecolor); 
     border:1px solid var(--bordercolor);
+}
+
+canvas:hover {
+    cursor: pointer;
+}
+
+button {
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid black;
+    margin: 10px;
+}
+
+.titlecontainer {
+    display: flex;
+    margin-right: auto;
+    margin-left: auto;
+    justify-content: center;
+}
+
+div {
+    margin: 8px;
 }
