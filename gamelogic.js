@@ -85,9 +85,17 @@ function drawBall() {
 }
 
 function drawObstacles(){
+    //bottom rectangle
     ctx.beginPath();
-    ctx.rect(barx, bary, 100, 150-difficulty);
-    ctx.fillStyle = "#95dd00";
+    ctx.rect(barx, bary + 150 - difficulty, 50, 300);
+    ctx.fillStyle = "#000000";
+    ctx.fill();
+    ctx.closePath();
+
+    //top rectangle
+    ctx.beginPath();
+    ctx.rect(barx, 0, 50, bary);
+    ctx.fillStyle = "#000000";
     ctx.fill();
     ctx.closePath();
 }
@@ -136,7 +144,7 @@ function draw() {
     drawBird()
     if(y + dy > canvas.height-ballRadius || y + dy < ballRadius) {endMenu = true}
 
-    if ((y < bary || y + 20 > bary + 150 - difficulty) && (barx < x && x < barx+90)) {endMenu = true}
+    if ((y < bary || y + 20 > bary + 150 - difficulty) && (barx < x && x < barx+50)) {endMenu = true}
     if (spacePressed){
         flapped = 40
         spacePressed = false
