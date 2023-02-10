@@ -1,13 +1,95 @@
-document.addEventListener('DOMContentLoaded', function() {
-    document.addEventListener("keydown", flap)
+let canvas = document.getElementById('gameCanvas')
+let ctx = canvas.getContext('2d')
 
-    if (sessionStorage.getItem('score')){
-        document.getElementById('hiscore').innerText=  "High Score: " + sessionStorage.getItem('score') + " - " + sessionStorage.getItem('bestUser')
+canvas.addEventListener('click', function() { 
+    if (displayMenu == false){spacePressed = true}
+    });
+
+document.addEventListener("keydown", flap)
+
+if (sessionStorage.getItem('score')){
+    document.getElementById('hiscore').innerText=  "High Score: " + sessionStorage.getItem('score') + " - " + sessionStorage.getItem('bestUser')
+}
+
+// initial bird placement
+let spacePressed = false
+let birdSize = 11
+var x = canvas.width/4
+var y = canvas.height-200
+var dx = 2
+var dy = 3 
+let goingUp = false
+
+let flapped = 0
+let obstacleX = canvas.width - 100
+let obstacleY = 100
+let score = 0
+
+//Set difficulty
+let difficultyBar = document.getElementById('difficultybar')
+difficultyBar.addEventListener('change', updateDifficulty)
+
+let difficulty = 20
+if (sessionStorage.getItem('difficulty')){
+    difficulty = sessionStorage.getItem('difficulty')
+    difficultyBar.value = difficulty
+}
+
+document.getElementById('getusername').addEventListener('submit', showgame)
+
+//music setup
+let music = document.getElementById('gamesound')
+let endNoise = document.getElementById('endsound')
+endNoise.loop = false
+endNoise.volume = .2
+let endsoundPlayed = false
+let musicOn = sessionStorage.getItem('musicOn')
+let soundButton = document.getElementById('soundbutton')
+
+if (musicOn === true) {
+    soundButton.innerHTML = '&#x1f50a'
+} else {
+    soundButton.innerHTML = '&#x1f507'
+}
+
+// load bird and cloud images
+let image = new Image()
+image.src = 'output-onlinepngtools.png'
+
+let cloud = new Image()
+cloud.src = 'cloud.png'
+let cloudX = canvas.width
+let cloudY = Math.random()*canvas.height
+
+let displayMenu = true
+let endMenu = false
+
+if (sessionStorage.getItem('theme') === 'darkmode') {
+    settheme('darkmode');
+} else {
+    settheme('lightmode');
+}
+
+function changetheme(){
+    if (sessionStorage.getItem('theme') === 'darkmode') {
+        settheme('lightmode');
+        document.getElementById('switch').innerHTML = '&#x263E'
+    } else {
+        settheme('darkmode');
+        document.getElementById('switch').innerHTML = '&#x263C'
     }
-    let difficultybar = document.getElementById('difficultybar')
-    difficultybar.addEventListener('change', updateDifficulty)
-    document.getElementById('getusername').addEventListener('submit', showgame)
-})
+}
+
+function settheme(theme){
+    sessionStorage.setItem('theme', theme)
+    document.documentElement.className= theme
+    if (theme==='darkmode') {
+        document.getElementById('switch').innerHTML = '&#x263C'
+    } else {
+        document.getElementById('switch').innerHTML = '&#x263E'
+    }
+}
+
 
 function showgame(){
     let username = this[0].value
@@ -20,77 +102,36 @@ function showgame(){
     }
     return false
 }
+
 function flap(e){
     if (e.key ===" "){
         spacePressed = true
     }
 }
 
-let canvas = document.getElementById('gameCanvas')
-let ctx = canvas.getContext('2d')
-canvas.addEventListener('click', function() { 
-    if (displaymenu == false){spacePressed = true}
-    }, false);
-
-
-let difficultybar = document.getElementById('difficultybar')
-let spacePressed = false
-let birdSize = 13
-var x = canvas.width/4
-var y = canvas.height-200
-var dx = 2
-var dy = 3 
-let difficulty = 50
-
-if (sessionStorage.getItem('difficulty')){
-    difficulty = sessionStorage.getItem('difficulty')
-    difficultybar.value = difficulty
-} else {
-    difficulty = 50
-}
-let gap = canvas.height - difficulty
-let flapped = 0
-let barx = canvas.width - 100
-let bary = 100
-let score = 0
-let goingup = false
-let music = document.getElementById('gamesound')
-let endnoise = document.getElementById('endsound')
-endnoise.loop = false
-endnoise.volume = .3
-let endsoundplayed = false
-
-let musicOn = sessionStorage.getItem('muted')
-
-let soundbutton = document.getElementById('soundbutton')
-if (musicOn == true) {
-    soundbutton.innerText = 'Mute'
-} else {
-    soundbutton.innerText = 'Unmute'
-}
-
-function playmusic(){
-    if (musicOn == true){
+function playMusic(){
+    if (musicOn === true){
         music.play()
     }
 }
+
 function playEndNoise(){
-    if (endsoundplayed == false && musicOn == true){
-        endnoise.play()
-        endsoundplayed = true
+    if (endsoundPlayed === false && musicOn === true){
+        endNoise.play()
+        endsoundPlayed = true
     }
 }
 
 function togglemute(){
     let button = document.getElementById('soundbutton')
-    if (musicOn == true){
+    if (musicOn === true){
         musicOn = false
-        button.innerText = 	'Unmute'
-        sessionStorage.setItem('muted', true)
+        button.innerHTML = '&#x1f507'
+        sessionStorage.setItem('musicOn', false)
     } else {
         musicOn = true
-        button.innerText = 'Mute'
-        sessionStorage.setItem('muted', false)
+        button.innerHTML = '&#x1f50a'
+        sessionStorage.setItem('musicOn', true)
     }
 }
 
@@ -98,20 +139,17 @@ function updateDifficulty(){
     difficulty = document.getElementById('difficultybar').value
     sessionStorage.setItem('difficulty', difficulty)
 }
-let image = new Image()
-image.src = 'output-onlinepngtools.png'
-
-let cloud = new Image()
-cloud.src = 'cloud.png'
-let cloudX = canvas.width
-let cloudY = Math.random()*canvas.height
 
 function drawcloud(){
     ctx.drawImage(cloud, cloudX, cloudY)
+    if (cloudX < 0) {
+        cloudX = canvas.width
+        cloudY = Math.random()*canvas.height
+    }
 }
 
 function drawBird(){
-    if (goingup){
+    if (goingUp){
         ctx.save()
         ctx.translate(x-35, y-35)
         ctx.rotate(-30*Math.PI/180)
@@ -129,23 +167,30 @@ function drawBird(){
 
 function drawObstacles(){
     let color = "#000000"
-    if (localStorage.getItem('theme') === 'darkmode') { color = "#eeeeee" } 
+    if (sessionStorage.getItem('theme') === 'darkmode') { color = "#eeeeee" } 
     //bottom rectangle
     ctx.beginPath();
-    ctx.rect(barx, bary + 150 - difficulty, 50, 300);
+    ctx.rect(obstacleX, obstacleY + 150 - difficulty, 50, 300);
     ctx.fillStyle = color
     ctx.fill();
     ctx.closePath();
 
     //top rectangle
     ctx.beginPath();
-    ctx.rect(barx, 0, 50, bary);
+    ctx.rect(obstacleX, 0, 50, obstacleY);
     ctx.fillStyle = color
     ctx.fill();
     ctx.closePath();
+
+    if (obstacleX < 0) {
+        updateScore()
+        //reset obstacle position
+        obstacleX = canvas.width
+        obstacleY = Math.random()*(canvas.height - difficulty - 100) // -100 offset so gap isn't too low
+    }
 }
 
-function endgame() {
+function endGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawcloud()
     drawObstacles()
@@ -164,78 +209,79 @@ function newGame(){
     canvas.removeEventListener('click', newGame)
     flapped = 0
     score = 0
-    goingup = false
+    goingUp = false
     endMenu = false
     spacePressed = false
     cloudX = canvas.width
-    barx = canvas.width
-    bary = 100
+    obstacleX = canvas.width
+    obstacleY = 100
     x = canvas.width/4
     y = canvas.height-200
-    dx = 2
-    dy = 3 
-    endsoundplayed = false
+    endsoundPlayed = false
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
+
 function drawScore() {
   ctx.font = "24px Arial";
   ctx.fillStyle = "#eeeeee";
   ctx.fillText(`Score: ${score}`, 190, 30);
 }
 
-function draw() {
+function checkCollisions(){
+    // check staying in bounds
+    if(y + dy > canvas.height-birdSize || y + dy < birdSize){
+        endMenu = true
+    }
+
+    // check collisions, +10 to adjust lower hitbox
+    if ((y - birdSize < obstacleY || y + birdSize +10 > obstacleY + 150 - difficulty) && (obstacleX < x && x < obstacleX+60)) {
+        endMenu = true
+    }
+
+}
+
+function flapWings() {
+    if (flapped > 0) {
+        y -= 15
+        flapped -= 8
+        goingUp = true
+    } else {
+        y += dy 
+        goingUp = false
+    }
+}
+
+function updateScore(){
+    score += 1
+    document.getElementById('score').innerText = "Score: " + score
+    if (score > sessionStorage.getItem('score')) {
+        sessionStorage.setItem('score', score)
+        sessionStorage.setItem('bestUser', sessionStorage.getItem('currentUser'))
+        document.getElementById('hiscore').innerText=  "High Score: " + score + " - " + sessionStorage.getItem('bestUser')
+    }
+    
+}
+
+function drawGame() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawcloud()
     drawObstacles()
     drawBird()
-    // check staying in bounds
-    if(y + dy > canvas.height-birdSize || y + dy < birdSize) {endMenu = true}
+    drawScore()
+    checkCollisions()
+    flapWings()
 
-    // check collisions
-    if ((y - birdSize < bary || y + birdSize > bary + 150 - difficulty) && (barx < x && x < barx+50)) {endMenu = true}
+    cloudX -= 3
+    obstacleX -= 7
+    
     if (spacePressed){
         flapped = 40
         spacePressed = false
     }
-    if (flapped > 0) {
-        y -= 20
-        flapped -= 1
-        goingup = true
-    } else {
-        y += dy 
-        goingup = false
-    }
-    drawScore()
-    flapped -= 10
-    barx -= 7
-    cloudX -= 3
-    if (cloudX < 0) {
-        cloudX = canvas.width
-        cloudY = Math.random()*canvas.height
-    }
-    if (barx < 0) {
-        //reset obstacle position
-        barx = canvas.width
-        bary = Math.random()*(canvas.height - difficulty - 100)
-        score += 1
-        document.getElementById('score').innerText= "Score: " + score
-        if (score > sessionStorage.getItem('score')) {
-            sessionStorage.setItem('score', score)
-            sessionStorage.setItem('bestUser', sessionStorage.getItem('currentUser'))
-            document.getElementById('hiscore').innerText=  "High Score: " + score + " - " + sessionStorage.getItem('bestUser')
-        }
-    }
-}
-
-let playbutton = {
-    x : canvas.width/2,
-    y : canvas.height/2,
-    width : 200,
-    height : 100
 }
 
 function playButtonPressed(){
-    displaymenu = false
+    displayMenu = false
 }
 
 function drawMenu(){
@@ -246,48 +292,17 @@ function drawMenu(){
     canvas.addEventListener('click', playButtonPressed)
 }
 
-let displaymenu = true
-let endMenu = false
 function playGame(){
-    if (displaymenu == true){
+    if (displayMenu === true){
         drawMenu()
-    } else if (endMenu == false){
-        playmusic()
-        draw()
+    } else if (endMenu === false){
+        playMusic()
+        drawGame()
     } else {
         music.pause()
         playEndNoise()
-        endgame()
+        endGame()
     }
 }
 
 setInterval(playGame, 10);
-
-function changetheme(){
-    if (localStorage.getItem('theme') === 'darkmode') {
-        settheme('lightmode');
-        document.getElementById('switch').innerHTML = '&#x263E'
-    } else {
-        settheme('darkmode');
-        document.getElementById('switch').innerHTML = '&#x263C'
-    }
-}
-
-function settheme(theme){
-    localStorage.setItem('theme', theme)
-    document.documentElement.className= theme
-    if (theme==='darkmode') {
-        document.getElementById('switch').innerHTML = '&#x263E'
-    } else {
-        document.getElementById('switch').innerHTML = '&#x263C'
-    }
-}
-
-
-(function (){
-    if (localStorage.getItem('theme') === 'darkmode') {
-        settheme('darkmode');
-    } else {
-        settheme('lightmode');
-    }
-})()
