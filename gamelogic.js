@@ -57,11 +57,16 @@ let goingup = false
 let music = document.getElementById('gamesound')
 let endnoise = document.getElementById('endsound')
 endnoise.loop = false
+endnoise.volume = .3
 let endsoundplayed = false
 
-let musicOn = true
-if (sessionStorage.getItem('muted') == true) {
-    musicOn = false
+let musicOn = sessionStorage.getItem('muted')
+
+let soundbutton = document.getElementById('soundbutton')
+if (musicOn == true) {
+    soundbutton.innerText = 'Mute'
+} else {
+    soundbutton.innerText = 'Unmute'
 }
 
 function playmusic(){
@@ -79,15 +84,13 @@ function playEndNoise(){
 function togglemute(){
     let button = document.getElementById('soundbutton')
     if (musicOn == true){
-        console.log('music off')
         musicOn = false
-        button.innerText = 	'&#128266'
-        localStorage.setItem('muted', true)
+        button.innerText = 	'Unmute'
+        sessionStorage.setItem('muted', true)
     } else {
-        console.log('music on')
         musicOn = true
-        button.innerText = 'mute'
-        localStorage.setItem('muted', false)
+        button.innerText = 'Mute'
+        sessionStorage.setItem('muted', false)
     }
 }
 
