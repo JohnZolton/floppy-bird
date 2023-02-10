@@ -45,7 +45,7 @@ if (sessionStorage.getItem('difficulty')){
 let music = document.getElementById('gamesound')
 let endnoise = document.getElementById('endsound')
 endnoise.loop = false
-endnoise.volume = .3
+endnoise.volume = .2
 let endsoundplayed = false
 let musicOn = sessionStorage.getItem('musicOn')
 let soundbutton = document.getElementById('soundbutton')
@@ -147,6 +147,10 @@ function updateDifficulty(){
 
 function drawcloud(){
     ctx.drawImage(cloud, cloudX, cloudY)
+    if (cloudX < 0) {
+        cloudX = canvas.width
+        cloudY = Math.random()*canvas.height
+    }
 }
 
 function drawBird(){
@@ -182,6 +186,13 @@ function drawObstacles(){
     ctx.fillStyle = color
     ctx.fill();
     ctx.closePath();
+
+    if (obstacleX < 0) {
+        updateScore()
+        //reset obstacle position
+        obstacleX = canvas.width
+        obstacleY = Math.random()*(canvas.height - difficulty - 100)
+    }
 }
 
 function endgame() {
@@ -211,8 +222,6 @@ function newGame(){
     obstacleY = 100
     x = canvas.width/4
     y = canvas.height-200
-    dx = 2
-    dy = 3 
     endsoundplayed = false
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
@@ -223,22 +232,20 @@ function drawScore() {
   ctx.fillText(`Score: ${score}`, 190, 30);
 }
 
-function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawcloud()
-    drawObstacles()
-    drawBird()
-    drawScore()
-
+function checkCollisions(){
     // check staying in bounds
-    if(y + dy > canvas.height-birdSize || y + dy < birdSize) {endMenu = true}
+    if(y + dy > canvas.height-birdSize || y + dy < birdSize){
+        endMenu = true
+    }
 
     // check collisions
-    if ((y - birdSize < obstacleY || y + birdSize > obstacleY + 150 - difficulty) && (obstacleX < x && x < obstacleX+50)) {endMenu = true}
-    if (spacePressed){
-        flapped = 40
-        spacePressed = false
+    if ((y - birdSize < obstacleY || y + birdSize > obstacleY + 150 - difficulty) && (obstacleX < x && x < obstacleX+50)) {
+        endMenu = true
     }
+
+}
+
+function flapWings() {
     if (flapped > 0) {
         y -= 20
         flapped -= 10
@@ -247,24 +254,34 @@ function draw() {
         y += dy 
         goingup = false
     }
+}
 
-    obstacleX -= 7
-    cloudX -= 3
-    if (cloudX < 0) {
-        cloudX = canvas.width
-        cloudY = Math.random()*canvas.height
+function updateScore(){
+    score += 1
+    document.getElementById('score').innerText= "Score: " + score
+    if (score > sessionStorage.getItem('score')) {
+        sessionStorage.setItem('score', score)
+        sessionStorage.setItem('bestUser', sessionStorage.getItem('currentUser'))
+        document.getElementById('hiscore').innerText=  "High Score: " + score + " - " + sessionStorage.getItem('bestUser')
     }
-    if (obstacleX < 0) {
-        //reset obstacle position
-        obstacleX = canvas.width
-        obstacleY = Math.random()*(canvas.height - difficulty - 100)
-        score += 1
-        document.getElementById('score').innerText= "Score: " + score
-        if (score > sessionStorage.getItem('score')) {
-            sessionStorage.setItem('score', score)
-            sessionStorage.setItem('bestUser', sessionStorage.getItem('currentUser'))
-            document.getElementById('hiscore').innerText=  "High Score: " + score + " - " + sessionStorage.getItem('bestUser')
-        }
+    
+}
+
+function drawGame() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawcloud()
+    drawObstacles()
+    drawBird()
+    drawScore()
+    checkCollisions()
+    flapWings()
+
+    cloudX -= 3
+    obstacleX -= 7
+    
+    if (spacePressed){
+        flapped = 40
+        spacePressed = false
     }
 }
 
@@ -281,11 +298,11 @@ function drawMenu(){
 }
 
 function playGame(){
-    if (displaymenu == true){
+    if (displaymenu === true){
         drawMenu()
-    } else if (endMenu == false){
+    } else if (endMenu === false){
         playmusic()
-        draw()
+        drawGame()
     } else {
         music.pause()
         playEndNoise()
