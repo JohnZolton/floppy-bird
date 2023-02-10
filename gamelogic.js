@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', function() {
 })
 
 function showgame(){
-    console.log(this[0].value)
     let username = this[0].value
     if (0 < username.length && username.length <= 15) {
         document.getElementById('gamebox').style.display = 'block'
@@ -36,7 +35,7 @@ canvas.addEventListener('click', function() {
 
 let difficultybar = document.getElementById('difficultybar')
 let spacePressed = false
-var ballRadius = 10
+let birdSize = 13
 var x = canvas.width/4
 var y = canvas.height-200
 var dx = 2
@@ -55,11 +54,49 @@ let barx = canvas.width - 100
 let bary = 100
 let score = 0
 let goingup = false
+let music = document.getElementById('gamesound')
+let endnoise = document.getElementById('endsound')
+endnoise.loop = false
+endnoise.volume = .3
+let endsoundplayed = false
+
+let musicOn = sessionStorage.getItem('muted')
+
+let soundbutton = document.getElementById('soundbutton')
+if (musicOn == true) {
+    soundbutton.innerText = 'Mute'
+} else {
+    soundbutton.innerText = 'Unmute'
+}
+
+function playmusic(){
+    if (musicOn == true){
+        music.play()
+    }
+}
+function playEndNoise(){
+    if (endsoundplayed == false && musicOn == true){
+        endnoise.play()
+        endsoundplayed = true
+    }
+}
+
+function togglemute(){
+    let button = document.getElementById('soundbutton')
+    if (musicOn == true){
+        musicOn = false
+        button.innerText = 	'Unmute'
+        sessionStorage.setItem('muted', true)
+    } else {
+        musicOn = true
+        button.innerText = 'Mute'
+        sessionStorage.setItem('muted', false)
+    }
+}
 
 function updateDifficulty(){
     difficulty = document.getElementById('difficultybar').value
     sessionStorage.setItem('difficulty', difficulty)
-    console.log(difficulty)
 }
 let image = new Image()
 image.src = 'output-onlinepngtools.png'
@@ -113,9 +150,7 @@ function endgame() {
     drawcloud()
     drawObstacles()
     drawBird()
-    ctx.font = "24px Arial";
-    ctx.fillStyle = "#eeeeee";
-    ctx.fillText(`Score: ${score}`, 195, 30);
+    drawScore()
 
     ctx.font = "24px Arial";
     ctx.fillStyle = "#eeeeee";
@@ -139,6 +174,7 @@ function newGame(){
     y = canvas.height-200
     dx = 2
     dy = 3 
+    endsoundplayed = false
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 function drawScore() {
@@ -152,9 +188,11 @@ function draw() {
     drawcloud()
     drawObstacles()
     drawBird()
-    if(y + dy > canvas.height-ballRadius || y + dy < ballRadius) {endMenu = true}
+    // check staying in bounds
+    if(y + dy > canvas.height-birdSize || y + dy < birdSize) {endMenu = true}
 
-    if ((y < bary || y + 20 > bary + 150 - difficulty) && (barx < x && x < barx+50)) {endMenu = true}
+    // check collisions
+    if ((y - birdSize < bary || y + birdSize > bary + 150 - difficulty) && (barx < x && x < barx+50)) {endMenu = true}
     if (spacePressed){
         flapped = 40
         spacePressed = false
@@ -176,6 +214,7 @@ function draw() {
         cloudY = Math.random()*canvas.height
     }
     if (barx < 0) {
+        //reset obstacle position
         barx = canvas.width
         bary = Math.random()*(canvas.height - difficulty - 100)
         score += 1
@@ -213,8 +252,11 @@ function playGame(){
     if (displaymenu == true){
         drawMenu()
     } else if (endMenu == false){
+        playmusic()
         draw()
     } else {
+        music.pause()
+        playEndNoise()
         endgame()
     }
 }
